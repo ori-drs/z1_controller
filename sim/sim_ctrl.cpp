@@ -35,17 +35,32 @@ int main(int argc, char **argv){
     /* set the print format */
     std::cout << std::fixed << std::setprecision(5);
 
+    // Default namespace
+    std::string robot_namespace = "/z1_gazebo";
+
+    // Parse command-line arguments
+    std::vector<char*> new_argv;
+    new_argv.push_back(argv[0]); // Keep the program name
+    for (int i = 1; i < argc; ++i) {
+        if (std::string(argv[i]) == "k") {
+            new_argv.push_back(argv[i]);
+        } else {
+            robot_namespace = argv[i];
+        }
+    }
+
+    int new_argc = new_argv.size();
 
     EmptyAction emptyAction((int)ArmFSMStateName::INVALID);
     std::vector<KeyAction*> events;
-    CtrlComponents *ctrlComp = new CtrlComponents(argc, argv);
+    CtrlComponents *ctrlComp = new CtrlComponents(new_argc, new_argv.data());
     
     ros::init(argc, argv, "z1_controller");
 
     ctrlComp->dt = 1.0/250.;
     ctrlComp->armConfigPath =  "../config/";
     ctrlComp->stateCSV = new CSVTool("../config/savedArmStates.csv");
-    ctrlComp->ioInter = new IOROS();
+    ctrlComp->ioInter = new IOROS(robot_namespace);
     ctrlComp->geneObj();
     if(ctrlComp->ctrl == Control::SDK){
         ctrlComp->cmdPanel = new ARMSDK(events, emptyAction, "127.0.0.1", 8072, 8071, 0.002);

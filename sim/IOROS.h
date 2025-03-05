@@ -8,7 +8,7 @@
 
 class IOROS : public IOInterface{
 public:
-    IOROS();
+    IOROS(const std::string& ns = "/z1_gazebo");
     ~IOROS();
     bool sendRecv(const LowlevelCmd *cmd, LowlevelState *state);
 private:
@@ -17,6 +17,7 @@ private:
     ros::Publisher _servo_pub[7];
     unitree_legged_msgs::MotorState _joint_state[7];
     unitree_legged_msgs::MotorCmd _joint_cmd[7];
+    std::string _namespace;
     void _sendCmd(const LowlevelCmd *cmd);
     void _recvState(LowlevelState *state);
     void _initRecv();
