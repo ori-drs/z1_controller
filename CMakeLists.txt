@@ -33,9 +33,11 @@ if(${catkin_FOUND})
         ${catkin_INCLUDE_DIRS}
     )
 
+    # Don't export the libraries and include directories to other packages, not needed since other packages just use the SDK
+    # (and the poorly-made include structure may actually result in conflicts with other packages)
     catkin_package(
-        INCLUDE_DIRS include
-        LIBRARIES Z1_${CMAKE_HOST_SYSTEM_PROCESSOR}
+        # INCLUDE_DIRS include
+        # LIBRARIES Z1_${CMAKE_HOST_SYSTEM_PROCESSOR}
         # DEPENDS Boost Eigen3
         CATKIN_DEPENDS roscpp geometry_msgs std_msgs controller_manager joint_state_controller robot_state_publisher tf
     )
