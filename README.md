@@ -44,5 +44,5 @@ You should now be able to start the arm controller and command the arm via keybo
 
 ## Documentation
 
-- [Original](http://dev-z1.unitree.com)
-- [ORI](https://oxfordrobotics.atlassian.net/wiki/spaces/DRSC/pages/29400010/Unitree+Z1+Arm) (documents updates and changes -- read this after the original docs)
+- [Original](http://dev-z1.unitree.com) (official docs)
+- [ORI](https://oxfordrobotics.atlassian.net/wiki/spaces/DRSC/pages/29400010/Unitree+Z1+Arm) (corrections, updates and changes -- read this after the original docs)
