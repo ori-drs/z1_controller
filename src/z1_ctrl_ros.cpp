@@ -15,7 +15,9 @@
 #include "FSM/State_TeachRepeat.h"
 #include "FSM/State_Trajectory.h"
 #include "FSM/State_LowCmd.h"
-#include "IOROS.h"
+#include "interface/IOUDPWithPublisher.h"
+#include <ros/package.h>
+#include <boost/filesystem.hpp>
 
 bool running = true;
 
@@ -30,37 +32,36 @@ void setProcessScheduler(){
 }
 
 int main(int argc, char **argv){
+
+    ros::init(argc, argv, "z1_controller");
+    ros::NodeHandle nh;
+
+    ros::AsyncSpinner subSpinner(2);
+    subSpinner.start();
+
+    std::string package_path = ros::package::getPath("z1_controller");
+    if (package_path.empty()) {
+        std::cerr << "[ERROR] Could not find package path for 'z1_controller'." << std::endl;
+        return -1;
+    }
+
     /* set real-time process */
     setProcessScheduler();
     /* set the print format */
     std::cout << std::fixed << std::setprecision(5);
 
-    // Default namespace
-    std::string robot_namespace = "/z1_gazebo";
-
-    // Parse command-line arguments
-    std::vector<char*> new_argv;
-    new_argv.push_back(argv[0]); // Keep the program name
-    for (int i = 1; i < argc; ++i) {
-        if (std::string(argv[i]) == "k") {
-            new_argv.push_back(argv[i]);
-        } else {
-            robot_namespace = argv[i];
-        }
-    }
-
-    int new_argc = new_argv.size();
 
     EmptyAction emptyAction((int)ArmFSMStateName::INVALID);
     std::vector<KeyAction*> events;
-    CtrlComponents *ctrlComp = new CtrlComponents(new_argc, new_argv.data());
+    // Disgusting hack to change the active process directory to the required one
+    // Blame Unitree for hard-coding relative directories in their pre-compiled code...
+    boost::filesystem::current_path(package_path + "/src/");
+    CtrlComponents *ctrlComp = new CtrlComponents(argc, argv);
     
-    ros::init(argc, argv, "z1_controller");
-
     ctrlComp->dt = 1.0/250.;
-    ctrlComp->armConfigPath =  "../config/";
-    ctrlComp->stateCSV = new CSVTool("../config/savedArmStates.csv");
-    ctrlComp->ioInter = new IOROS(robot_namespace);
+    ctrlComp->armConfigPath =  package_path + "/config/";
+    ctrlComp->stateCSV = new CSVTool(package_path + "/config/savedArmStates.csv");
+    ctrlComp->ioInter = new IOUDPWithPublisher(ctrlComp->ctrl_IP.c_str(), ctrlComp->ctrl_port, nh);
     ctrlComp->geneObj();
     if(ctrlComp->ctrl == Control::SDK){
         ctrlComp->cmdPanel = new ARMSDK(events, emptyAction, "127.0.0.1", 8072, 8071, 0.002);
