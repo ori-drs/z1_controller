@@ -36,6 +36,9 @@ int main(int argc, char **argv){
     ros::init(argc, argv, "z1_controller");
     ros::NodeHandle nh;
 
+    ros::AsyncSpinner subSpinner(2);
+    subSpinner.start();
+
     std::string package_path = ros::package::getPath("z1_controller");
     if (package_path.empty()) {
         std::cerr << "[ERROR] Could not find package path for 'z1_controller'." << std::endl;
@@ -56,7 +59,7 @@ int main(int argc, char **argv){
     ctrlComp->dt = 1.0/250.;
     ctrlComp->armConfigPath =  package_path + "/config/";
     ctrlComp->stateCSV = new CSVTool( package_path + "/config/savedArmStates.csv");
-    ctrlComp->ioInter = new IOROS(&nh);
+    ctrlComp->ioInter = new IOROS(nh);
     ctrlComp->geneObj();
     if(ctrlComp->ctrl == Control::SDK){
         ctrlComp->cmdPanel = new ARMSDK(events, emptyAction, "127.0.0.1", 8072, 8071, 0.002);

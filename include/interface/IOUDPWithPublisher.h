@@ -9,13 +9,13 @@
 
 class IOUDPWithPublisher : public IOUDP {
 public:
-    IOUDPWithPublisher(const char* IP, uint port, ros::NodeHandle* nh, size_t timeOutUs = 100000, bool showInfo = true);
+    IOUDPWithPublisher(const char* IP, uint port, ros::NodeHandle& nh, size_t timeOutUs = 100000, bool showInfo = true);
     ~IOUDPWithPublisher();
 
     bool sendRecv(const LowlevelCmd *cmd, LowlevelState *state) override;
 
 private:
-    ros::NodeHandle* _nh;
+    ros::NodeHandle& _nh;
     ros::Publisher _jointStatePub;
     ros::ServiceServer _has_gripper_service;
 

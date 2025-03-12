@@ -9,11 +9,11 @@
 
 class IOROS : public IOInterface{
 public:
-    IOROS(ros::NodeHandle* nh);
+    IOROS(ros::NodeHandle& nh);
     ~IOROS();
     bool sendRecv(const LowlevelCmd *cmd, LowlevelState *state);
 private:
-    ros::NodeHandle* _nh;
+    ros::NodeHandle& _nh;
     ros::Subscriber _servo_sub[7];
     ros::Publisher _servo_pub[7];
     ros::ServiceServer _has_gripper_service;

@@ -8,18 +8,17 @@ void RosShutDown(int sig){
 	ros::shutdown();
 }
 
-IOROS::IOROS(ros::NodeHandle* nh) : _nh(nh) {
+IOROS::IOROS(ros::NodeHandle& nh) : _nh(nh) {
     std::cout << "The control interface for ROS Gazebo simulation" << std::endl;
     hasGripper = false;
     /* start subscriber */
     _initRecv();
-    ros::AsyncSpinner subSpinner(1); // one threads
-    subSpinner.start();
+
     usleep(300000);     //wait for subscribers start
     /* initialize publisher */
     _initSend();
     
-    _has_gripper_service = _nh->advertiseService("has_gripper", &IOROS::_hasGripperCallback, this);
+    _has_gripper_service = _nh.advertiseService("has_gripper", &IOROS::_hasGripperCallback, this);
 
     signal(SIGINT, RosShutDown);
 
@@ -67,23 +66,23 @@ void IOROS::_recvState(LowlevelState *state){
 }
 
 void IOROS::_initSend(){
-    _servo_pub[0] = _nh->advertise<unitree_legged_msgs::MotorCmd>("Joint01_controller/command", 1);
-    _servo_pub[1] = _nh->advertise<unitree_legged_msgs::MotorCmd>("Joint02_controller/command", 1);
-    _servo_pub[2] = _nh->advertise<unitree_legged_msgs::MotorCmd>("Joint03_controller/command", 1);
-    _servo_pub[3] = _nh->advertise<unitree_legged_msgs::MotorCmd>("Joint04_controller/command", 1);
-    _servo_pub[4] = _nh->advertise<unitree_legged_msgs::MotorCmd>("Joint05_controller/command", 1);
-    _servo_pub[5] = _nh->advertise<unitree_legged_msgs::MotorCmd>("Joint06_controller/command", 1);
-    _servo_pub[6] = _nh->advertise<unitree_legged_msgs::MotorCmd>("gripper_controller/command", 1);
+    _servo_pub[0] = _nh.advertise<unitree_legged_msgs::MotorCmd>("Joint01_controller/command", 1);
+    _servo_pub[1] = _nh.advertise<unitree_legged_msgs::MotorCmd>("Joint02_controller/command", 1);
+    _servo_pub[2] = _nh.advertise<unitree_legged_msgs::MotorCmd>("Joint03_controller/command", 1);
+    _servo_pub[3] = _nh.advertise<unitree_legged_msgs::MotorCmd>("Joint04_controller/command", 1);
+    _servo_pub[4] = _nh.advertise<unitree_legged_msgs::MotorCmd>("Joint05_controller/command", 1);
+    _servo_pub[5] = _nh.advertise<unitree_legged_msgs::MotorCmd>("Joint06_controller/command", 1);
+    _servo_pub[6] = _nh.advertise<unitree_legged_msgs::MotorCmd>("gripper_controller/command", 1);
 }
 
 void IOROS::_initRecv(){
-    _servo_sub[0] = _nh->subscribe("Joint01_controller/state", 1, &IOROS::_joint00Callback, this);
-    _servo_sub[1] = _nh->subscribe("Joint02_controller/state", 1, &IOROS::_joint01Callback, this);
-    _servo_sub[2] = _nh->subscribe("Joint03_controller/state", 1, &IOROS::_joint02Callback, this);
-    _servo_sub[3] = _nh->subscribe("Joint04_controller/state", 1, &IOROS::_joint03Callback, this);
-    _servo_sub[4] = _nh->subscribe("Joint05_controller/state", 1, &IOROS::_joint04Callback, this);
-    _servo_sub[5] = _nh->subscribe("Joint06_controller/state", 1, &IOROS::_joint05Callback, this);
-    _servo_sub[6] = _nh->subscribe("gripper_controller/state", 1, &IOROS::_gripperCallback, this);
+    _servo_sub[0] = _nh.subscribe("Joint01_controller/state", 1, &IOROS::_joint00Callback, this);
+    _servo_sub[1] = _nh.subscribe("Joint02_controller/state", 1, &IOROS::_joint01Callback, this);
+    _servo_sub[2] = _nh.subscribe("Joint03_controller/state", 1, &IOROS::_joint02Callback, this);
+    _servo_sub[3] = _nh.subscribe("Joint04_controller/state", 1, &IOROS::_joint03Callback, this);
+    _servo_sub[4] = _nh.subscribe("Joint05_controller/state", 1, &IOROS::_joint04Callback, this);
+    _servo_sub[5] = _nh.subscribe("Joint06_controller/state", 1, &IOROS::_joint05Callback, this);
+    _servo_sub[6] = _nh.subscribe("gripper_controller/state", 1, &IOROS::_gripperCallback, this);
 }
 
 void IOROS::_joint00Callback(const unitree_legged_msgs::MotorState& msg){

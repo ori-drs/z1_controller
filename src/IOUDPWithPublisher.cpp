@@ -1,13 +1,10 @@
 #include "interface/IOUDPWithPublisher.h"
 
-IOUDPWithPublisher::IOUDPWithPublisher(const char* IP, uint port, ros::NodeHandle* nh, size_t timeOutUs, bool showInfo)
+IOUDPWithPublisher::IOUDPWithPublisher(const char* IP, uint port, ros::NodeHandle& nh, size_t timeOutUs, bool showInfo)
     : IOUDP(IP, port, timeOutUs, showInfo), _nh(nh) {
 
-    ros::AsyncSpinner subSpinner(1); // one threads
-    subSpinner.start();
-
-    _jointStatePub = _nh->advertise<sensor_msgs::JointState>("joint_states", 10);
-    _has_gripper_service = _nh->advertiseService("has_gripper", &IOUDPWithPublisher::_hasGripperCallback, this);
+    _jointStatePub = _nh.advertise<sensor_msgs::JointState>("joint_states", 10);
+    _has_gripper_service = _nh.advertiseService("has_gripper", &IOUDPWithPublisher::_hasGripperCallback, this);
 }
 
 IOUDPWithPublisher::~IOUDPWithPublisher() {
