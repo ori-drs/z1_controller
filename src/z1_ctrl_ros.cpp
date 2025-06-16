@@ -36,6 +36,10 @@ int main(int argc, char **argv){
     ros::init(argc, argv, "z1_controller");
     ros::NodeHandle nh;
 
+    float dt;
+    nh.param<float>("dt", dt, 1.0/250.);
+    // std::cout << "dt: " << dt << std::endl;
+
     ros::AsyncSpinner subSpinner(2);
     subSpinner.start();
 
@@ -44,12 +48,10 @@ int main(int argc, char **argv){
         std::cerr << "[ERROR] Could not find package path for 'z1_controller'." << std::endl;
         return -1;
     }
-
     /* set real-time process */
     setProcessScheduler();
     /* set the print format */
     std::cout << std::fixed << std::setprecision(5);
-
 
     EmptyAction emptyAction((int)ArmFSMStateName::INVALID);
     std::vector<KeyAction*> events;
@@ -58,7 +60,7 @@ int main(int argc, char **argv){
     boost::filesystem::current_path(package_path + "/src/");
     CtrlComponents *ctrlComp = new CtrlComponents(argc, argv);
     
-    ctrlComp->dt = 1.0/250.;
+    ctrlComp->dt = dt;
     ctrlComp->armConfigPath =  package_path + "/config/";
     ctrlComp->stateCSV = new CSVTool(package_path + "/config/savedArmStates.csv");
     ctrlComp->ioInter = new IOUDPWithPublisher(ctrlComp->ctrl_IP.c_str(), ctrlComp->ctrl_port, nh);
